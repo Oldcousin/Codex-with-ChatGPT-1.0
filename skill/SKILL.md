@@ -1,15 +1,16 @@
 ---
-name: codex-with-chatgpt
+name: codex-with-chatgpt-1-0
 description: >
   Use ChatGPT (web) as the planning and review brain for Codex coding sessions,
   while Codex keeps full execution ownership. Use when the user says
-  "使用 Codex with ChatGPT ..." / "Set up Codex with ChatGPT" / "用 ChatGPT 规划",
+  "使用 Codex-with-ChatGPT-1.0 ..." / "使用 Codex with ChatGPT ..." /
+  "Set up Codex with ChatGPT" / "用 ChatGPT 规划",
   when they ask to connect ChatGPT to the current workspace, disconnect it,
   check or restore the project connection after restarting Codex, or run a task
   through the ChatGPT planning loop.
 ---
 
-# Codex with ChatGPT1.0
+# Codex-with-ChatGPT-1.0
 
 ChatGPT thinks. Codex works.
 
@@ -273,17 +274,16 @@ maintenance workflow. For other workflows run:
 - `{ "updateAvailable": true }` → tell the user that an update is available.
   Run the update workflow when the user requests maintenance.
 
-## Workflow: update（"更新 Codex with ChatGPT"，or triggered by the daily check）
+## Workflow: update（"更新 Codex-with-ChatGPT-1.0"）
 
 Inside the checkout directory (see Locations):
 
 1. Run `git pull --ff-only`. If local edits prevent the update, preserve them
    and report the conflict so the user can decide how to handle them.
 2. `corepack pnpm install && corepack pnpm build`.
-3. Re-install the Skill: copy `skill/SKILL.md` to
-   `<codex-home>/skills/codex-with-chatgpt/SKILL.md`, then fix the "checkout lives at:"
-   line in the copy to the actual checkout path. Merge upstream changes while
-   preserving the installed 1.0 post-restart workflow, repair gates and display name.
+3. If upstream Skill changes are needed for the runtime update, merge them into
+   `<codex-home>/skills/codex-with-chatgpt-1-0/SKILL.md`. Preserve its registered name,
+   `agents/openai.yaml`, actual checkout path, post-restart workflow and repair gates.
 4. `c2c sandbox-allow --json` (so existing installs pick up the sandbox allowlist),
    then `c2c restart -w <workspace>` so the bridge runs the new code, then
    `c2c update-check --force --json` to refresh the cache (should now report up to date).
@@ -312,7 +312,7 @@ Speak only of 临时地址 / 固定域名 / 登录 Cloudflare.
 4. Never put connection credentials in the project. The CLI stores them in
    the C2C state directory.
 
-## Workflow: first-time setup（"使用 Codex with ChatGPT 完成首次配置"）
+## Workflow: first-time setup（"使用 Codex-with-ChatGPT-1.0 完成首次配置"）
 
 1. Detect prerequisites yourself: `node --version` (>= 20), and check `cloudflared`.
    - If cloudflared is missing on macOS run `brew install cloudflared`; on Windows use
@@ -376,7 +376,7 @@ Speak only of 临时地址 / 固定域名 / 登录 Cloudflare.
 7. Report to the user exactly in this shape (no internals):
 
 ```
-Codex with ChatGPT
+Codex-with-ChatGPT-1.0
 
 ✓ 当前项目已识别
 ✓ Workspace Bridge 已启动
@@ -571,7 +571,7 @@ Be substantive: why, which file, what to test. No empty one-liners and
 no 40-step epics. Use C2C control messages.
 ```
 
-## Workflow: coding task（"使用 Codex with ChatGPT 完成 XXX"）
+## Workflow: coding task（"使用 Codex-with-ChatGPT-1.0 完成 XXX"）
 
 Protocol states sent to ChatGPT: INIT → PLAN → EXECUTING → EXECUTED → REVIEW → (PLAN | DONE | BLOCKED).
 Local checkpoint states (session only, never a ChatGPT `STATE:` line):
