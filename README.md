@@ -1,0 +1,40 @@
+# Codex with ChatGPT 1.0
+
+Codex Skill，用于让 ChatGPT 网页版分析项目、制定方案并审查结果，由 Codex 负责修改文件、执行命令和测试。这个仓库包含 1.0 的 Skill 和安装说明。运行连接器仍需要 [XiaoDuoYa/codex-with-chatgpt](https://github.com/XiaoDuoYa/codex-with-chatgpt) 提供的 C2C Bridge 和 CLI。
+
+## 1.0 更新了什么
+
+- **停机满 30 分钟后的连接检查。** 从 Codex 关闭到再次启动满 30 分钟时，在重启后的第一个相关协作请求中先做只读检查。仅启动 Codex 不执行 Skill。时间不明时也可检查，结果会标明时长未知。
+- **健康连接继续使用。** 检查通过后，在内置浏览器通过 ChatGPT 核验工作区身份和实际文件读取。只有确认故障且请求允许恢复时，才修复受影响的环节。
+- **替换旧连接前先验证新地址。** 新地址不可用时保留旧连接和聊天关联。HTTP 530 会先复查。需要永久删除旧连接时，先解释影响并等待用户明确确认，之后才重建、配对和验证。
+- **仅检查模式严格只读。** 用现有的安全文件测试读取。没有适用文件时报告未验证文件读取。重连期间不自动安装更新或改动沙箱设置。
+- **验证后才保存关联。** 旧聊天无法读取时，可以先在同一项目的新聊天验证；工作区和文件读取都通过后才保存替代关联。
+
+## 一段话安装
+
+把下面这段话发给 Codex：
+
+> 请按本仓库 README 安装「Codex with ChatGPT 1.0」。若已安装上游运行时，请复用并核对路径。备份现有 Skill，再安装本仓库的 SKILL.md 和 agents/openai.yaml，填入本机上游运行时的真实路径。根据当前工作区情况做首次配置或验证已有连接。请使用内置浏览器，最后实测读取工作区文件。
+
+## 手动安装与配置
+
+1. 准备 Git、Node.js、Corepack 和 `cloudflared`。参考上游 [中文安装说明](https://github.com/XiaoDuoYa/codex-with-chatgpt/blob/main/README.zh-CN.md)。本版本基于上游 `0.1.3`，对应 [提交 `535a07d`](https://github.com/XiaoDuoYa/codex-with-chatgpt/tree/535a07dbb7aee887924c53767d985c09d405319d)。
+2. 若未安装上游运行时，克隆上游仓库并切换到上述提交，从该目录执行 `corepack pnpm install` 和 `corepack pnpm build`。使用能运行该仓库指定 pnpm 版本的 Node.js。已有运行时可先通过 `node <上游目录>/bin/c2c.js --help` 核对。
+3. 将 [skill 目录](skill/)内的内容复制到 `<codex-home>/skills/codex-with-chatgpt/`。有非空的 `CODEX_HOME` 时使用它，否则使用 `~/.codex`，Windows 上通常是 `%USERPROFILE%\.codex`。修改安装后的 `SKILL.md`，把 `<upstream-checkout>` 占位符替换为本机上游项目的绝对路径。已有同名 Skill 时先备份。
+4. 在 Codex 中调用 `$codex-with-chatgpt`。新项目可发送「使用 Codex with ChatGPT 完成首次配置」，按 Skill 指引在内置浏览器配对并验证读取。已配置项目可发送「检查连接」，复用已有项目和连接。
+
+以后可以用「使用 Codex with ChatGPT，帮我完成这个任务」启动协作。重启后只想验证状态时发「重启完成，检查连接」。希望失败时进入恢复流程，则发「重启完成，检查并在失败时重连」。
+
+## 工作原理与故障排查
+
+Codex 在 ChatGPT 中提交简短任务说明。ChatGPT 按需从工作区读取上下文、拟定方案和核对执行结果。C2C Bridge 为 ChatGPT 提供只读工作区访问，代码修改、Git 操作及本地测试由 Codex 执行。项目连接使用授权和一次性配对。详细边界见上游 [协议说明](https://github.com/XiaoDuoYa/codex-with-chatgpt/blob/main/docs/protocol.md)及[安全模型](https://github.com/XiaoDuoYa/codex-with-chatgpt/blob/main/docs/security.md)。
+
+- **重启后文件读取失败**：发「检查并在失败时重连」，先检查本机服务和公开地址，再判断是否需要更新 ChatGPT 端。浏览器控制报错应单独排查。
+- **临时地址经常变化**：如果已有托管在 Cloudflare 的域名，可参考上游说明配置固定地址。
+- **更新上游**：把运行时升级作为单独的维护任务，保留 1.0 的重启检查、删除审核和显示元数据。直接用上游 Skill 覆盖会丢失这些定制。
+
+## 验证和许可
+
+1.0 已通过 Skill 格式校验、显示名发现和重连审核规则复核。曾对 12 个固定情境逐项推演，包括 29:59 与 30:00、结束时间未知、新地址不健康和拒绝删除。离线推演用于核对指令，真实停机满 30 分钟后的故障恢复仍需在实际环境验证。
+
+本项目是 [XiaoDuoYa/codex-with-chatgpt](https://github.com/XiaoDuoYa/codex-with-chatgpt) 的 Skill 定制版本，沿用 [MIT License](LICENSE) 并保留上游版权声明。
