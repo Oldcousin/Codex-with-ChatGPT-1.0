@@ -10,11 +10,21 @@ Codex Skill，用于让 ChatGPT 网页版分析项目、制定方案并审查结
 - **仅检查模式严格只读。** 用现有的安全文件测试读取。没有适用文件时报告未验证文件读取。重连期间不自动安装更新或改动沙箱设置。
 - **验证后才保存关联。** 旧聊天无法读取时，可以先在同一项目的新聊天验证；工作区和文件读取都通过后才保存替代关联。
 
-## 一段话安装
+## One-paste install · 一段话安装
 
-把下面这段话发给 Codex：
+不熟悉 Git、Node.js 或终端也可以安装。把下面整个代码块复制给 Codex。
 
-> 请按本仓库 README 安装「Codex with ChatGPT 1.0」。若已安装上游运行时，请复用并核对路径。备份现有 Skill，再安装本仓库的 SKILL.md 和 agents/openai.yaml，填入本机上游运行时的真实路径。根据当前工作区情况做首次配置或验证已有连接。请使用内置浏览器，最后实测读取工作区文件。
+```text
+请帮我完整安装并配置 Codex with ChatGPT 1.0。请自行执行下面的步骤，需要我操作时再叫我。
+
+1. 环境自检。检查 Git、Node.js、Corepack 和 cloudflared。已有环境能运行上游锁定的 pnpm 11 就复用；需要安装 Node.js 时使用 24 LTS。缺少系统工具时，macOS 用 Homebrew，Windows 用 winget；缺少 Corepack 时用 npm install --global corepack 补齐。
+2. 下载两个仓库。把上游运行时 https://github.com/XiaoDuoYa/codex-with-chatgpt.git 克隆到 ~/codex-with-chatgpt。首次安装时切换到 0.1.3 对应的提交 535a07dbb7aee887924c53767d985c09d405319d；已有兼容运行时就复用。把 1.0 Skill https://github.com/Oldcousin/Codex-with-ChatGPT-1.0.git 克隆到 ~/codex-with-chatgpt-1.0；已有该仓库的干净检出时，从远端 main 快进更新。保留已有本地改动。
+3. 构建上游运行时。需要新建或补齐构建时，在上游目录执行 corepack pnpm install 和 corepack pnpm build，再运行 node bin/c2c.js --help 检查 CLI 可用。
+4. 安装 1.0 Skill。若 CODEX_HOME 非空，使用它；否则使用 ~/.codex（Windows 默认 %USERPROFILE%\.codex）。先备份已有同名 Skill，再从 1.0 仓库把 skill/SKILL.md 和 skill/agents/openai.yaml 复制到 <codex-home>/skills/codex-with-chatgpt/，保留 agents/ 子目录。在安装后的 SKILL.md 中，找到 “The codex-with-chatgpt checkout lives at:” 一行，把 <upstream-checkout> 替换为本机上游运行时的绝对路径。
+5. 配置当前工作区。首次配置时按安装后的 SKILL.md 中的 first-time setup 流程执行，确认连接选项后运行 c2c setup，在 Codex 内置浏览器打开 ChatGPT 并完成配对。已有连接时先做只读检查，健康就复用；确认故障并获得恢复授权后，按 1.0 流程验证新地址。若必须删除旧连接，先说明影响，再单独征得我的明确确认。全程只用 Codex 内置浏览器。
+6. 只有遇到必须由我完成的操作时才停下来，例如登录 ChatGPT 或 Cloudflare、输入验证码、完成两步验证、选择连接方式或确认删除。每次只告诉我一个要做的动作。
+7. 完成后给我一份 ✓ 清单，确认 Skill 已安装、连接对应的是当前工作区，并让 ChatGPT 实际读取当前工作区里的一个安全文件，告诉我读到的是哪个文件。遇到问题先自行排查；如果文件读取未通过，请用简单的话说明卡在哪一步。
+```
 
 ## 手动安装与配置
 
