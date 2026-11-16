@@ -136,8 +136,9 @@ that close the tab, hide the window, or stall on the settings page.
      (`https://chatgpt.com/g/g-p-…/project`)
    Never click Reconnect / Refresh on an existing connector. The old address is
    dead and that page hangs on "This site cannot be reached". When the address
-   changed: Delete THIS workspace's `connectorName` only, then create it again
-   via the 加插件 URL (same name, new Server URL). Do not put that public
+   changed: follow the checks and confirmation in **Workflow: reconnect
+   after address reclaim** before deleting THIS workspace's `connectorName`.
+   Then create it via the 加插件 URL (same name, new Server URL). Do not put that public
    address into Project instructions — write the connector **name** only.
 
 5. **Do not wait for 8 tools** on the settings page. "Connected" / authorize
@@ -314,6 +315,11 @@ Speak only of 临时地址 / 固定域名 / 登录 Cloudflare.
 
 ## Workflow: first-time setup（"使用 Codex-with-ChatGPT-1.0 完成首次配置"）
 
+If this workspace already has a saved association and a read-only Doctor check
+passes, verify its identity and file access in the saved chat before running
+setup. On success, reuse it and finish. If verification fails, use the applicable
+repair workflow for a confirmed fault when authorized.
+
 1. Detect prerequisites yourself: `node --version` (>= 20), and check `cloudflared`.
    - If cloudflared is missing on macOS run `brew install cloudflared`; on Windows use
      `winget install Cloudflare.cloudflared`. Do this yourself; don't ask.
@@ -349,12 +355,10 @@ Speak only of 临时地址 / 固定域名 / 登录 Cloudflare.
      Never record it as off. If creating the connector later says developer
      mode is required, open this page, enable it, save `--developer-mode`,
      and retry create — do not skip that recovery.
-   - 已有该 `connectorName`: `https://chatgpt.com/plugins` — Delete it (never
-     Reconnect). Then `goto` the 加插件 URL below.
+   - 已有该 `connectorName`: use **Existing connector during first-time setup**
+     before changing it. If it can be reused, skip to step 6.
    - 还没有 / 刚删掉: `https://chatgpt.com/plugins#settings/Connectors?create-connector=true&redirectAfter=%2Fplugins`
      Operate ONLY on `connectorName` from step 3:
-      - If that exact name exists: Delete it, then create it again. Never
-        Reconnect, never edit-in-place, never open the old Server URL.
       - If it does not exist: create one with that exact name.
       - Never rename, delete, or edit a connector that belongs to another workspace.
       - Description: `Securely connect ChatGPT to the current Codex workspace for planning and review.`
@@ -390,6 +394,24 @@ Ready.
 If a login wall appears (ChatGPT, Cloudflare): stop, tell the user the ONE thing
 to do ("请登录 ChatGPT，完成后告诉我'好了'"), then continue.
 
+### Existing connector during first-time setup
+
+Apply this check in both automatic and guided manual setup before asking for
+or performing any deletion. Use only the exact `connectorName` for this
+workspace. Check the connector's current address on the plugins page and the
+replacement's health with `c2c doctor -w <workspace> --no-fix --json`.
+
+- Healthy matching address: keep the connector and verify the workspace name and
+  file read in the ChatGPT conversation. If authorization fails, diagnose it
+  through **Workflow: repair**.
+- Confirmed stale address: use the replacement and explicit deletion
+  confirmation checks in step 3 of **Workflow: reconnect after address reclaim**.
+  Only after confirmation may automatic setup delete the exact connector or
+  guided setup ask the user to delete it. Continue first-time setup afterward.
+- If the address comparison is uncertain, the replacement is unhealthy, or
+  confirmation is missing or declined, keep the connector and report the
+  unresolved step.
+
 ### Guided manual ChatGPT setup
 
 Enter this path when `setupMode` is `manual` (chosen at the start), or when
@@ -416,8 +438,9 @@ next action:
    `https://chatgpt.com/#settings/Security` and enable 开发人员模式. After they
    say「好了」, `c2c prefs set --developer-mode`. If it is already remembered,
    skip this step.
-2. Ask them to open `https://chatgpt.com/plugins`. If the exact `connectorName`
-   exists, delete only that connector. Never ask them to touch another workspace's connector.
+2. Ask them to open `https://chatgpt.com/plugins`. If the exact
+   `connectorName` exists, apply **Existing connector during first-time setup**.
+   If it can be reused, go directly to the ChatGPT verification step.
 3. Ask them to open
    `https://chatgpt.com/plugins#settings/Connectors?create-connector=true&redirectAfter=%2Fplugins`
    and create the exact `connectorName` with:
